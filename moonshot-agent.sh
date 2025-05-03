@@ -124,20 +124,30 @@ log "INFO: Script started by user $(whoami)."
 
 if [[ $DRY_RUN -eq 1 ]]; then
     echo -e "${YELLOW}DRY RUN MODE ENABLED${NC}"
-    echo -e "No changes will be made. The following steps would be performed:"
+    echo -e "This will test authentication and download, but will NOT install the agent."
     divider
     echo -e "${YELLOW}Step 1: Authentication${NC}"
-    echo "  - Prompt for HTTP password for user '$USER'"
-    echo -e "${YELLOW}Step 2: Downloading the Agent${NC}"
-    echo "  - Download agent package from:"
-    echo "    $URL"
-    echo "  - Save as $RPM_FILE"
-    echo -e "${YELLOW}Step 3: Installing the Agent${NC}"
-    echo "  - Install the agent RPM on your system"
-    echo -e "${YELLOW}Step 4: Cleaning Up${NC}"
-    echo "  - Remove the downloaded RPM file"
+    echo -e "To test the download, we need your HTTP password for user '${USER}'."
+    read -s -p "Please enter the password: " PASS
+    echo
     divider
-    echo -e "${CYAN}Dry run complete. No actions were performed.${NC}"
+    echo -e "${YELLOW}Step 2: Testing Download and Authentication${NC}"
+    echo -e "Attempting to download the agent package for testing..."
+    log "DRY RUN: Attempting to download agent package from $URL."
+    (wget --user="$USER" --password="$PASS" "$URL" -O "$RPM_FILE" >> "$LOG_FILE" 2>&1) & spinner
+    WGET_STATUS=$?
+    if [ $WGET_STATUS -ne 0 ] || [ ! -f "$RPM_FILE" ]; then
+        echo -e "${RED}Dry run failed!${NC}"
+        echo -e "Could not download the agent. Please check your credentials, network, or contact your administrator."
+        log "DRY RUN ERROR: Download failed."
+        exit 2
+    fi
+    echo -e "${GREEN}Dry run successful!${NC}"
+    echo -e "Authentication and download test passed. The agent file will now be deleted."
+    rm -f "$RPM_FILE"
+    log "DRY RUN: Download and authentication successful. File deleted."
+    divider
+    echo -e "${CYAN}Dry run complete. No changes were made to your system.${NC}"
     exit 0
 fi
 
