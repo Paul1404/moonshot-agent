@@ -20,6 +20,7 @@ NC='\033[0m' # No Color
 # --- ASCII Art Header ---
 ascii_art() {
 cat << "EOF"
+
     dMMMMMMMMb .aMMMb  .aMMMb  dMMMMb  .dMMMb  dMP dMP .aMMMb dMMMMMMP 
    dMP"dMP"dMPdMP"dMP dMP"dMP dMP dMP dMP" VP dMP dMP dMP"dMP   dMP    
   dMP dMP dMPdMP dMP dMP dMP dMP dMP  VMMMb  dMMMMMP dMP dMP   dMP     
